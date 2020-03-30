@@ -5,7 +5,7 @@ import config from "../../config";
 import store from "../../lib/store";
 
 const PrivateRoute = ({ children }) => {
-  const isLoggedIn = store.get(config.sessionKey);
+  const isLoggedIn = store.get(config.session);
 
   if (!isLoggedIn) {
     return <Redirect to="/login" noThrow />;

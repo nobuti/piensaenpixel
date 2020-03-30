@@ -8,7 +8,7 @@ const App = () => (
   <Layout>
     <Router>
       <Private path="/private">
-        <One path="one" />
+        <One path="/" />
         <Two path="two" />
       </Private>
     </Router>
