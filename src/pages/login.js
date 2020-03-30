@@ -61,7 +61,7 @@ export default () => {
     <Layout>
       <h1>Login</h1>
       <form onSubmit={onSubmit}>
-        <input type="text" name="email" />
+        <input type="text" name="email" placeholder="Insert your email" />
         <button type="submit" disable={state.fetching.toString()}>
           Log in
         </button>
