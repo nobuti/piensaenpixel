@@ -17,7 +17,8 @@
     "gatsby": "^2.20.8",
     "gatsby-plugin-emotion": "^4.2.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "universal-cookie": "^4.0.3"
   },
   "devDependencies": {
     "eslint-config-prettier": "^6.10.1",

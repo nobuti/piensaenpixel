@@ -1,9 +1,9 @@
 import React, { useReducer } from "react";
 import Airtable from "airtable";
 import { navigate } from "@reach/router";
+import Cookies from "universal-cookie";
 
 import Layout from "../components/layout";
-import store from "../lib/store";
 import config from "../config";
 
 const loginReducerInitialState = { fetching: false, error: null };
@@ -28,6 +28,7 @@ const base = Airtable.base(process.env.AIRTABLE_BASE);
 
 export default () => {
   const [state, dispatch] = useReducer(loginReducer, loginReducerInitialState);
+  const cookies = new Cookies();
 
   const login = (email) =>
     base("Granted")
@@ -37,7 +38,9 @@ export default () => {
       .eachPage(
         (records) => {
           if (records.length > 0) {
-            store.set(config.session, email);
+            cookies.set(config.session, email, {
+              maxAge: config.ttl,
+            });
             dispatch({ type: "success" });
             navigate("/private");
           } else {

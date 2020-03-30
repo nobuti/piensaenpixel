@@ -1,11 +1,12 @@
 import React from "react";
 import { Redirect } from "@reach/router";
+import Cookies from "universal-cookie";
 
 import config from "../../config";
-import store from "../../lib/store";
 
 const PrivateRoute = ({ children }) => {
-  const isLoggedIn = store.get(config.session);
+  const cookies = new Cookies();
+  const isLoggedIn = cookies.get(config.session);
 
   if (!isLoggedIn) {
     return <Redirect to="/login" noThrow />;
