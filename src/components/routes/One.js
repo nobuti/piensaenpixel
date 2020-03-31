@@ -1,2 +1,2 @@
 import React from "react";
-export default () => <div>Project one</div>;
+export default () => <h1>Project one</h1>;
