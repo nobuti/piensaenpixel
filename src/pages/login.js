@@ -1,10 +1,37 @@
 import React, { useReducer } from "react";
 import Airtable from "airtable";
-import { navigate } from "@reach/router";
+import { navigate, Redirect } from "@reach/router";
 import Cookies from "universal-cookie";
+import styled from "@emotion/styled";
 
 import Layout from "../components/layout";
 import config from "../config";
+import { Input, Button } from "../components/forms";
+
+import Loading from "../assets/svg/loading.svg";
+
+const Form = styled.form`
+  max-width: 300px;
+  margin-bottom: 24px;
+
+  ${Button} svg {
+    width: 24px;
+    height: 24px;
+    stroke: #0c5246;
+  }
+`;
+
+const Row = styled.div`
+  display: flex;
+
+  & + & {
+    margin-top: 16px;
+  }
+`;
+
+const Error = styled.div`
+  font-size: 12px;
+`;
 
 const loginReducerInitialState = { fetching: false, error: null };
 function loginReducer(state, action) {
@@ -29,8 +56,10 @@ const base = Airtable.base(process.env.AIRTABLE_BASE);
 export default () => {
   const [state, dispatch] = useReducer(loginReducer, loginReducerInitialState);
   const cookies = new Cookies();
+  const isLoggedIn = cookies.get(config.session);
 
-  const login = (email) =>
+  const login = (email) => {
+    dispatch({ type: "fetching" });
     base("Granted")
       .select({
         filterByFormula: `{email} = '${email}'`,
@@ -40,13 +69,14 @@ export default () => {
           if (records.length > 0) {
             cookies.set(config.session, email, {
               maxAge: config.ttl,
+              path: "/",
             });
             dispatch({ type: "success" });
             navigate("/private");
           } else {
             dispatch({
               type: "error",
-              error: "Bummer, parece que no tienes permiso",
+              error: "Bummer, you are not granted.",
             });
           }
         },
@@ -54,23 +84,31 @@ export default () => {
           dispatch({ type: "error", error: `Error: ${error}` });
         }
       );
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
     login(e.target.email.value);
   };
 
+  if (isLoggedIn) {
+    return <Redirect to="/private" noThrow />;
+  }
+
   return (
     <Layout>
-      <h1>Login</h1>
-      <form onSubmit={onSubmit}>
-        <input type="text" name="email" placeholder="Insert your email" />
-        <button type="submit" disable={state.fetching.toString()}>
-          Log in
-        </button>
-      </form>
+      <Form onSubmit={onSubmit}>
+        <Row>
+          <Input type="text" name="email" placeholder="Insert your email" />
+        </Row>
+        <Row>
+          <Button type="submit" disable={state.fetching.toString()}>
+            {state.fetching ? <Loading /> : "Log in"}
+          </Button>
+        </Row>
+      </Form>
 
-      {state.error && <div>{state.error}</div>}
+      {state.error && <Error>{state.error}</Error>}
     </Layout>
   );
 };
